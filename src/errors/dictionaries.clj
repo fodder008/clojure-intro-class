@@ -167,6 +167,8 @@
                         :make-preobj (fn [matches] (make-preobj-hashes "There is an unmatched parameter in declaration of "
                                                                        (nth matches 1) :arg))}
                        {:class IllegalArgumentException
+                        ; TODO New message:
+                        ; (nth matches 1) "'s must be pairs, you passed an odd number of parameters to " (nth matches 1) " on line " (nth matches 3) " in the file " (nth matches 2)
                         :match #"(.*) requires an even number of forms in binding vector in (.*):(.*)"
                         :make-preobj (fn [matches] (make-preobj-hashes "A parameter for a " (nth matches 1)
                                                                        " is missing a binding on line "
