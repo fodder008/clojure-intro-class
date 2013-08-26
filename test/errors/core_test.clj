@@ -25,5 +25,5 @@
    (is (= "Test Message" (get-pretty-message-string simple-non-match-exception)))
    (is (= "Attempted to use unrecognized type oneType, but unrecognized type anotherType was expected." (get-pretty-message-string class-cast-exception)))
    (is (= "Function contains? does not allow a number as an argument" (get-pretty-message-string bigint-illegal-arg-ex)))
-   (is (= "" (get-pretty-message-string incorrect-let-exception)))
+   (is (= "A parameter for a let is missing a binding on line  in the file errors.core_test" (get-pretty-message-string incorrect-let-exception)))
    )

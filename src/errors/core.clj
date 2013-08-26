@@ -7,6 +7,7 @@
         [seesaw.core]))
 
 ;;(def ignore-nses #"(clojure|java)\..*")
+;; Ignore stack trace entries beginning with user, clojure, or java 
 (def ignore-nses #"(user|clojure|java)\..*")
 
 (defn- first-match [e message]
@@ -20,15 +21,46 @@
   	message (if m m "")] ; converting an empty message from nil to ""
   	  (if-let [entry (first-match e message)]
   	  	  ((:make-preobj entry) (re-matches  (:match entry) message)) 
-  	  	  (make-preobj-hashes message)))) 
+  	  	  (make-preobj-hashes message))))
 
+;; Returns true if a :trace-elems element is meaningful to the student
+(defn- is-meaningful-elem? [elem]
+     (and 
+      (:clojure elem) 
+      (not (re-matches ignore-nses (:ns elem))))
+  )
+
+;; Takes in a single :trace-elems entry and produces a string for 
+;; our filtered stacktrace
+(defn- create-error-str [err-elem]
+  (str
+    "\t"
+    (:ns err-elem)
+    "/"
+    (:fn err-elem)
+    " ("
+    (:file err-elem)
+    " line "
+    (:line err-elem)
+    ")"
+    )
+  )
+
+;; Creates the pre-object from a filtered stack trace
+(defn- create-pre-obj [errstrs]
+  (make-preobj-hashes (str "\nSequence of function calls:\n" (join "\n" errstrs)) :causes)
+  )
+
+;; Creates the full error object that is to be displayed
+(defn- create-error-obj [e preobj]
+    (make-obj (concat (make-preobj-hashes "ERROR: " :err) 
+                      (get-pretty-message e) 
+                      preobj)))
 
 ;; All together:
 (defn prettify-exception [e]
-  (let [info (stacktrace/parse-exception e)
-        cljerrs (filter #(and (:clojure %) (not (re-matches ignore-nses (:ns %))))
-                        (:trace-elems info))
-        errstrs (map #(str "\t" (:ns %) "/" (:fn %) " (" (:file %) " line " (:line %) ")") cljerrs)]
-    (show-error (make-obj (concat (make-preobj-hashes "ERROR: " :err) (get-pretty-message e) 
-    		    (make-preobj-hashes (str "\nSequence of function calls:\n" (join "\n" errstrs)) :causes)))
-		e)))
+  (let [preobj (->> e stacktrace/parse-exception 
+                       (#(filter is-meaningful-elem? (:trace-elems %))) 
+                       (map create-error-str)
+                       (create-pre-obj))]
+    (show-error (create-error-obj e preobj) e)))
