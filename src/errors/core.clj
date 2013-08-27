@@ -6,26 +6,27 @@
 	      [errors.messageobj]
         [seesaw.core]))
 
-;;(def ignore-nses #"(clojure|java)\..*")
 ;; Ignore stack trace entries beginning with user, clojure, or java 
 (def ignore-nses #"(user|clojure|java)\..*")
 
+;; Gets the first match out of the error dictionary 
+;; based on the exception class and the message
 (defn- first-match [e message]
-	(println (str (class e) " " message)) ; debugging print
+	;(println (str (class e) " " message)) ; debugging print
 	(first (filter #(and (instance? (:class %) e) (re-matches (:match %) message))
 			error-dictionary)))
 
 ;; Putting together a message (perhaps should be moved to errors.dictionaries? )
 (defn- get-pretty-message [e]
   (let [m (.getMessage e)
-  	message (if m m "")] ; converting an empty message from nil to ""
-  	  (if-let [entry (first-match e message)]
-  	  	  ((:make-preobj entry) (re-matches  (:match entry) message)) 
-  	  	  (make-preobj-hashes message))))
+  	    message (if m m "")] ; converting an empty message from nil to ""
+    (if-let [entry (first-match e message)]
+  	  ((:make-preobj entry) (re-matches  (:match entry) message))
+  	  (make-preobj-hashes message))))
 
 ;; Returns true if a :trace-elems element is meaningful to the student
 (defn- is-meaningful-elem? [elem]
-     (and 
+    (and 
       (:clojure elem) 
       (not (re-matches ignore-nses (:ns elem))))
   )
