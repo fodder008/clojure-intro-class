@@ -1,7 +1,4 @@
-(ns intro.student
-	(:use [corefns.core]
-        [seesaw.core]
-	[turtle.core]))
+(ns intro.student)
 
 ;; Testing compilation errors
 

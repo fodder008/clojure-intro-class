@@ -60,8 +60,8 @@
 
 ;; All together:
 (defn prettify-exception [e]
-  (let [preobj (->> e stacktrace/parse-exception 
-                       (#(filter is-meaningful-elem? (:trace-elems %))) 
-                       (map create-error-str)
-                       (create-pre-obj))]
+  (let [preobj (->> e stacktrace/parse-exception
+                      (#(filter is-meaningful-elem? (:trace-elems %)))
+                      (map create-error-str)
+                      (create-pre-obj))]
     (show-error (create-error-obj e preobj) e)))

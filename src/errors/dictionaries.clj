@@ -223,7 +223,8 @@
                         :match #"Unsupported binding form: (.*)"
                         :make-preobj (fn [matches] (make-preobj-hashes "You cannot use " (nth matches 1) :arg
                                                                        " as a variable."))}
-                       ;; Compilation errors 
+                       ;; Compilation errors
+                       ;; These next two exceptions about wrong # of args will only be thrown by macros NOT functions
                        {:class clojure.lang.Compiler$CompilerException
                         :match #"(.+): Too many arguments to (.+), compiling:(.+)"
                                         ;:replace "Compilation error: too many arguments to $2 while compiling $3"
@@ -239,11 +240,11 @@
                        {:class clojure.lang.Compiler$CompilerException    
                         :match #"(.+): EOF while reading, starting at line (.+), compiling:(.+)"
                         :replace "Compilation error: end of file, starting at line $2, while compiling $3.\nProbabbly a non-closing parentheses or bracket."
-                        :make-preobj make-mock-preobj}
+                        :make-preobj make-mock-preobj} ; TODO Make preobj function
                        {:class clojure.lang.Compiler$CompilerException
                         :match #"(.+): Unmatched delimiter: (.+), compiling:(.+)"
                                         ;:replace "Compilation error: a closing $2 without a matching opening one while compiling $3."
-		        :make-preobj make-mock-preobj}
+		        :make-preobj make-mock-preobj} ; TODO Make preobj function
                        {:class clojure.lang.Compiler$CompilerException
                         :match #"(.+): Unable to resolve symbol: (.+) in this context, compiling:\((.+)\)"
                                         ;:replace "Compilation error: name $2 is undefined in this context, while compiling $3."
